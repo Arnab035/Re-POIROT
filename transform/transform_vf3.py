@@ -43,6 +43,9 @@ event_type = {'a': 1,  # process
 if __name__ == "__main__":
     vertex_type = {}
     edge_type = {} # dict of int & set of tuples
+    if (len(sys.argv) != 3):
+        print("Incorrect format. Correct format is : python transform.py <file-to-read-from> <file-to-write-to>")
+        exit(0)
     with open(sys.argv[1], 'r') as f:
         for line in f:
             entry = line.split()
@@ -60,45 +63,48 @@ if __name__ == "__main__":
                 edge_type[int(entry[0])] = set()
     #print(edge_type)
     print("Number of vertices is: {}".format(len(vertex_type)))
-    keys = list(vertex_type.keys())
-    keys.sort()
-    sorted_vertex_type = OrderedDict()
-    for i in keys:
-        sorted_vertex_type[i] = vertex_type[i]
+    with open(sys.argv[2], 'w') as g:
+        g.write(str(len(vertex_type)) + "\n")
+        keys = list(vertex_type.keys())
+        keys.sort()
+        sorted_vertex_type = OrderedDict()
+        for i in keys:
+            sorted_vertex_type[i] = vertex_type[i]
 
-    normalized_vertex_type = {}
-    index = 0
-    for vertex_id in sorted_vertex_type:
-        normalized_vertex_type[vertex_id] = index
-        index = index + 1
+        normalized_vertex_type = {}
+        index = 0
+        for vertex_id in sorted_vertex_type:
+            normalized_vertex_type[vertex_id] = index
+            index = index + 1
     # debug
     #for vertex_id, v_type in normalized_vertex_type.items():
     #    print("{} {}".format(vertex_id, v_type))
 
-    modified_vertex_type = {}
-    for vertex_id, norm in normalized_vertex_type.items():
-        modified_vertex_type[norm] = event_type[sorted_vertex_type[vertex_id]]
+        modified_vertex_type = {}
+        for vertex_id, norm in normalized_vertex_type.items():
+            modified_vertex_type[norm] = event_type[sorted_vertex_type[vertex_id]]
 
-    for vertex_id, v_type in modified_vertex_type.items():
-        print("{} {}".format(vertex_id, v_type))
+        for vertex_id, v_type in modified_vertex_type.items():
+        #print("{} {}".format(vertex_id, v_type))
+            g.write(str(vertex_id) + " " + str(v_type) + "\n")
 
-    modified_edge_type = {}
-    for edge_id, edge_val in edge_type.items():
-        modified_edge_id = normalized_vertex_type[edge_id]
-        modified_edge_type[modified_edge_id] = set()
-        for edg_val in edge_val:
-            modified_edge_type[modified_edge_id].add((normalized_vertex_type[edg_val[0]], event_type[edg_val[1]]))
+        modified_edge_type = {}
+        for edge_id, edge_val in edge_type.items():
+            modified_edge_id = normalized_vertex_type[edge_id]
+            modified_edge_type[modified_edge_id] = set()
+            for edg_val in edge_val:
+                modified_edge_type[modified_edge_id].add((normalized_vertex_type[edg_val[0]], event_type[edg_val[1]]))
     
     # debug
     #for modified_edge_id, modified_edge_vals in modified_edge_type.items():
     #    for modified_edge_val in modified_edge_vals:
             #print("{} {} {}".format(modified_edge_id, modified_edge_val[0], modified_edge_val[1]))
   
-    e_keys = list(modified_edge_type.keys())
-    e_keys.sort()
-    sorted_modified_edge_type = OrderedDict()
-    for i in e_keys:
-        sorted_modified_edge_type[i] = modified_edge_type[i]
+        e_keys = list(modified_edge_type.keys())
+        e_keys.sort()
+        sorted_modified_edge_type = OrderedDict()
+        for i in e_keys:
+            sorted_modified_edge_type[i] = modified_edge_type[i]
     
     # debug
     #for sorted_modified_edge_id, sorted_modified_edge_vals in sorted_modified_edge_type.items():
@@ -106,11 +112,14 @@ if __name__ == "__main__":
     #        print("{} {} {}".format(sorted_modified_edge_id, sorted_modified_edge_val[0], 
     #            sorted_modified_edge_val[1]))
     
-    for i in range(0, len(vertex_type)):
-        if i not in sorted_modified_edge_type:
-            print(0)
-        else:
-            sorted_modified_edge_vals = sorted_modified_edge_type[i]
-            for sorted_modified_edge_val in sorted_modified_edge_vals:
-                print("{} {} {}".format(i, sorted_modified_edge_val[0],
-                        sorted_modified_edge_val[1]))
+        for i in range(0, len(vertex_type)):
+            if i not in sorted_modified_edge_type:
+                g.write("0" + "\n")
+            else:
+                sorted_modified_edge_vals = sorted_modified_edge_type[i]
+                # print("{}".format(len(sorted_modified_edge_vals)))
+                g.write(str(len(sorted_modified_edge_vals)) + "\n")
+                for sorted_modified_edge_val in sorted_modified_edge_vals:
+                    g.write(str(i) + " " + str(sorted_modified_edge_val[0]) + " " + str(sorted_modified_edge_val[1]) + "\n")
+                # print("{} {} {}".format(i, sorted_modified_edge_val[0],
+                  #      sorted_modified_edge_val[1]))
