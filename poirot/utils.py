@@ -25,7 +25,7 @@ def get_all_edges_in_graph(filename):
     params: filename
     returns: a list containing the edges.
              something like this:
-             [[2, 3], [4, 5], [6, 7]}
+             [[2, 3], [4, 5], [6, 7]]
     '''
     edges = []
     with open(filename, 'r') as f:
@@ -41,7 +41,7 @@ def find_ancestors(filename):
     params: filename
     returns: a dict containing ancestors of all vertices
              e.g. for edges [[0,2],[1,2],[2,3],[3,4],[2,5]]
-     the answer is: {0: [], 1: [], 2: [0, 1], 3: [0, 1, 2], 
+     the answer is: {0: [], 1: [], 2: [0, 1], 3: [0, 1, 2],
                    4: [0, 1, 2, 3], 5: [0, 1, 2]}
     '''
     graph = {}
@@ -80,23 +80,20 @@ def find_common_ancestors(process_nodes, ancestors):
     for s in ancestors_of_nodes[1:]:
         result.intersection_update(s)
     return result
-   
+
 def find_unique_nodes_from_flow(flow):
     '''
     given a flow, this function finds unique nodes
     in the flow
-    params: flow(a flow is represented by a list of edges)
+    params: flow(a flow is represented by a path of nodes,
+               meaning that they are inter-connected)
     returns: a list containing the unique nodes in the flow
     '''
-    unique_nodes_in_flow = []
-    for edge in flow:
-        unique_nodes_in_flow.append(edge[0])
-        unique_nodes_in_flow.append(edge[1])
-    return list(set(unique_nodes_in_flow))
+    return list(set(flow))
 
-def create_list_of_process_nodes(filename)
+def create_list_of_process_nodes(filename):
     '''
-    given a provenance graph, generate a list of all the 
+    given a provenance graph, generate a list of all the
     process nodes in the graph
     param(s): filename representing the provenance graph
     populates global variable called process_nodes
@@ -110,8 +107,8 @@ def create_list_of_process_nodes(filename)
             elif (entry[2].split(':')[1] == 'a'):
                 process_nodes.append(entry[1])
 
-def check_if_node_is_process_node(node)
-    '''b
+def check_if_node_is_process_node(node):
+    '''
     given a node represented as an integer,
     report if it is a process node
     param(s): node, represented as an integer
@@ -121,3 +118,26 @@ def check_if_node_is_process_node(node)
         return True
     else:
         return False
+
+
+def find_all_paths(graph, node_start, node_end, path=[]):
+    '''
+    given two nodes node_start and node_end,
+    this routine recursively finds all paths between
+    the two nodes in the graph graph.
+
+    credits: https://stackoverflow.com/a/24471320/
+    '''
+    path = path + [node_start]
+    if node_start == node_end:
+        return [path]
+    if node_start not in graph:
+        return []
+    paths = []
+    for node in graph[node_start]:
+        if node not in path:
+            newpaths = find_all_paths(graph, node, node_end, path)
+            for newpath in newpaths:
+                paths.append(newpath)
+    return paths
+
