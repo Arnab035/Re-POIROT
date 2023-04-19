@@ -76,10 +76,13 @@ def find_common_ancestors(process_nodes, ancestors):
     ancestors_of_nodes = []
     for process_node in process_nodes:
         ancestors_of_nodes.append(ancestors[process_node])
-    result = set(ancestors_of_nodes[0])
-    for s in ancestors_of_nodes[1:]:
-        result.intersection_update(s)
-    return result
+    result = []
+    if len(ancestors_of_nodes) > 1:
+        result = set(ancestors_of_nodes[0])
+        for s in ancestors_of_nodes[1:]:
+            result.intersection_update(s)
+    else:
+        return result
 
 def find_unique_nodes_from_flow(flow):
     '''

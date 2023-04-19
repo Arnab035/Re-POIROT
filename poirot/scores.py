@@ -1,3 +1,5 @@
+from utils import *
+
 # in this project,
 # a flow is represented by a list of nodes
 # for e.g. a flow between two nodes 1 & 4 can be
@@ -22,7 +24,6 @@ def min_number_of_compromise_points(flow, filename):
     # find common ancestors of process nodes.
     ancestors = find_ancestors(filename)
     common_ancestors = find_common_ancestors(process_nodes, ancestors)
-
     # as per the paper, the number of compromise points for the attacker
     # is the number of unique, common ancestors for process nodes in the
     # flow
@@ -44,21 +45,22 @@ def compute_influence_score(node_a, node_b, threshold, filename):
     with open(filename, 'r') as f:
         for line in f:
             entry = line.split()
-            if entry[0] in graph:
-                graph[entry[0]].append(entry[1])
+            if int(entry[0]) in graph:
+                graph[int(entry[0])].add(int(entry[1]))
             else:
-                graph[entry[0]] = []
+                graph[int(entry[0])] = set()
+    
+    graph = {key: list(value) for key, value in graph.items()}
     # now that we have graph, try to find all paths
     # between the two nodes node_a and node_b
     all_flows = find_all_paths(graph, node_a, node_b)
-
     # now that we have all paths/flows, find the minimum
     # number of compromise points for the attacker in
     # these flows/paths
     gamma = 0
     for flow in all_flows:
         cmin = min_number_of_compromise_points(flow, filename)
-        if cmin <= threshold:
+        if cmin != 0 and cmin <= threshold:
             gamma = max(gamma, 1/cmin)
     print("The influence score between nodes: {} and {} is {}".format(node_a, node_b,
                                    gamma))
