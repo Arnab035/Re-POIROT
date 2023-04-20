@@ -14,8 +14,8 @@ def get_all_nodes_in_graph(filename):
     with open(filename, 'r') as f:
         for line in f:
             entry = line.split()
-            unique_nodes.add(entry[0])
-            unique_nodes.add(entry[1])
+            unique_nodes.add(int(entry[0]))
+            unique_nodes.add(int(entry[1]))
     return list(unique_nodes)
 
 def get_all_edges_in_graph(filename):
@@ -31,7 +31,7 @@ def get_all_edges_in_graph(filename):
     with open(filename, 'r') as f:
         for line in f:
             entry = line.split()
-            edges.append([entry[0], entry[1]])
+            edges.append([int(entry[0]), int(entry[1])])
     return edges
 
 
@@ -81,6 +81,7 @@ def find_common_ancestors(process_nodes, ancestors):
         result = set(ancestors_of_nodes[0])
         for s in ancestors_of_nodes[1:]:
             result.intersection_update(s)
+        return list(result)
     else:
         return result
 
@@ -102,13 +103,15 @@ def create_list_of_process_nodes(filename):
     populates global variable called process_nodes
     '''
     global process_nodes
+    process_nodes_unique = set()
     with open(filename, 'r') as f:
         for line in f:
             entry = line.split()
             if (entry[2].split(':')[0] == 'a'):
-                process_nodes.append(entry[0])
+                process_nodes_unique.add(int(entry[0]))
             elif (entry[2].split(':')[1] == 'a'):
-                process_nodes.append(entry[1])
+                process_nodes_unique.add(int(entry[1]))
+    process_nodes.extend(list(process_nodes_unique))
 
 def check_if_node_is_process_node(node):
     '''
