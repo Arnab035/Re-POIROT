@@ -1,6 +1,16 @@
 
 process_nodes = []
 
+node_type = {'a': "process",
+             'b': "thread",
+             'c': "file",
+             'd': "map_anonymous",
+             'e': "n/a",
+             'f': "stdin",
+             'g': "stdout",
+             'h': "stderr"
+             }
+
 def get_all_nodes_in_graph(filename):
     '''
     most of the datasets have nodes not numbered
@@ -17,6 +27,26 @@ def get_all_nodes_in_graph(filename):
             unique_nodes.add(int(entry[0]))
             unique_nodes.add(int(entry[1]))
     return list(unique_nodes)
+
+def get_all_nodes_with_type_in_graph(filename):
+    '''
+    this function will return a list of unique nodes
+    in the graph, additionally this will annotate
+    the node with the node type in the graph.
+    params: filename containing the graph
+    returns: a list of tuples like this:
+    [(node-id, node-type), (node-id, node-type)..]
+    '''
+    unique_nodes_with_type = set()
+    with open(filename, 'r') as f:
+        for line in f:
+            entry = line.split()
+            object_types = entry[2].split(':')
+            unique_nodes_with_type.add((int(entry[0]),
+                node_type[object_types[0]]))
+            unique_nodes_with_type.add((int(entry[1]),
+                node_type[object_types[1]]))
+    return list(unique_nodes_with_type)
 
 def get_all_edges_in_graph(filename):
     '''
