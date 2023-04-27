@@ -41,16 +41,7 @@ def compute_influence_score(node_a, node_b, threshold, filename):
           : filename: the filename representing the graph
     returns: the influence score, gamma(i, j)
     '''
-    graph = {}
-    with open(filename, 'r') as f:
-        for line in f:
-            entry = line.split()
-            if int(entry[0]) in graph:
-                graph[int(entry[0])].add(int(entry[1]))
-            else:
-                graph[int(entry[0])] = set()
-    
-    graph = {key: list(value) for key, value in graph.items()}
+    graph = construct_graph(filename)
     # now that we have graph, try to find all paths
     # between the two nodes node_a and node_b
     all_flows = find_all_paths(graph, node_a, node_b)
@@ -65,3 +56,30 @@ def compute_influence_score(node_a, node_b, threshold, filename):
     print("The influence score between nodes: {} and {} is {}".format(node_a, node_b,
                                    gamma))
 
+def compute_alignment_score(query_graph_filename, provenance_graph_filename,
+                                    aligned_nodes):
+    '''
+    This computes the alignment score between two graph alignments
+    S(Gq :: Gp) where Gq is query graph and Gp is alignment from
+    provenance graph
+
+    params: query_graph_filename
+            provenance_graph_filename
+            aligned_nodes obtained from step 4 of poirot
+    returns: alignment score as outlined in equation 2.
+    '''
+    query_graph = construct_graph(query_graph_filename)
+    # find all flows in query graph, do dfs
+    # over all nodes
+    all_nodes = get_all_nodes_in_graph(query_graph_filename)
+    total_influence_score = 0
+    for node in all_nodes:
+        visited = set()
+        do_dfs(query_graph, node, visited)
+        for visited_node in visited:
+            influence_score = compute_influence_score(aligned_nodes[node],
+                    aligned_nodes[visited_node], threshold,
+                    provenance_graph_filename)
+            total_influence_score += influence_score
+            num_flows += 1
+    return total_influence_score/num_flows

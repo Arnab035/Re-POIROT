@@ -71,29 +71,12 @@ def find_subset_of_candidate_node_alignments(g_q_nodes_with_type,
     start_nodes = candidate_node_alignments[seed_node]
                       if seed_node in candidate_node_alignments else []
     # construct provenance graph
-    graph = {}
-    with open(filename, 'r') as f:
-        for line in f:
-            entry = line.split()
-            if int(entry[0]) in graph:
-                graph[int(entry[0])].add(int(entry[1]))
-            else:
-                graph[int(entry[0])] = set()
-    graph = {key: list(value) for key, value in graph.items()}
+    graph = construct_graph(filename)
 
     # do backward traversal
     # for this we construct another provenance graph
     # where the edges are in reverse
-    reverse_graph = {}
-    with open(filename, 'r') as f:
-        for line in f:
-            entry = line.split()
-            if int(entry[1]) in graph:
-                reverse_graph[int(entry[1])].add(int(entry[0]))
-            else:
-                reverse_graph[int(entry[1])] = set()
-
-    reverse_graph = {key: list(value) for key, value in reverse_graph.items()}
+    reverse_graph = construct_reverse_graph(filename)
 
     # do forward and backward traversal
     #TODO: optimization using influence score.
@@ -137,24 +120,10 @@ def find_graph_alignment(query_graph_filename, provenance_graph_filename, thresh
                                             provenance_graph_filename)
 
     # construct query graph
-    query_graph = {}
-    with open(query_graph_filename, 'r') as f:
-        for line in f:
-            entry = line.split()
-            if int(entry[0]) in query_graph:
-                query_graph[int(entry[0])].add(int(entry[1]))
-            else:
-                query_graph[int(entry[0])] = set()
+    query_graph = construct_graph(query_graph_filename)
 
     # construct reverse query graph
-    reverse_query_graph = {}
-    with open(query_graph_filename, 'r') as f:
-        for line in f:
-            entry = line.split()
-            if int(entry[1]) in reverse_query_graph:
-                reverse_query_graph[int(entry[1])].add(int(entry[0]))
-            else:
-                reverse_query_graph[int(entry[1])] = set()
+    reverse_query_graph = construct_reverse_graph(query_graph_filename)
 
     # now for each of the candidate nodes of query graph, try to find the
     # best alignment using the selection function

@@ -189,4 +189,42 @@ def do_dfs(graph, node, visited):
         if node in graph:
             for neighbor in graph[node]:
                 dfs(graph, neighbor, visited)
+    visited.discard(node)
+
+def construct_graph(filename):
+    '''
+    this utility function constructs a graph like
+    a dictionary where the key is a node and the
+    values are a list of nodes to which this has
+    outgoing edge
+    params: filename
+    returns dict{}
+    '''
+    graph = {}
+    with open(filename, 'r') as f:
+        for line in f:
+            entry = line.split()
+            if int(entry[0]) in graph:
+                graph[int(entry[0])].add(int(entry[1]))
+            else:
+                graph[int(entry[0])] = set()
+    graph = {key: list(value) for key, value in graph.items()}
+
+def construct_reverse_graph(filename):
+    '''
+    this utility function just reverses the edges
+    of the graph, to aid in backward traversals
+    params: filename
+    returns dict{}
+    '''
+    graph = {}
+    with open(filename, 'r') as f:
+        for line in f:
+            entry = line.split()
+            if int(entry[1]) in graph:
+                graph[int(entry[1])].add(int(entry[0]))
+            else:
+                graph[int(entry[1])] = set()
+    graph = {key: list(value) for key, value in graph.items()}
+
 
