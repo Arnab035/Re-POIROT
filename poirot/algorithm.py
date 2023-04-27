@@ -48,16 +48,17 @@ def select_seed_nodes(candidate_alignments, index):
     '''
     sorted_node_alignments = sorted(candidate_alignments,
             key=lambda k: len(candidate_alignments[k]))
+    print("sorted node alignments are : {}".format(sorted_node_alignments))
     return sorted_node_alignments[index]
 
 #step 3
 def find_subset_of_candidate_node_alignments(g_q_nodes_with_type,
-        filename):
+        provenance_graph_filename):
     '''
     params: g_q_nodes_with_type -> list of (node_id, node_type)
                            from the query graph.
-            filename -> filename containing
-                                    provenance graph
+            provenance_graph_filename -> filename containing
+                            provenance graph
     result: {node_id : [subset_node_alignments]} where node_id is the
             node from query graph.
             subset_node_alignments is the list of node alignments
@@ -66,17 +67,20 @@ def find_subset_of_candidate_node_alignments(g_q_nodes_with_type,
     '''
     candidate_node_alignments = find_candidate_node_alignments(g_q_nodes_with_type,
             provenance_graph_filename)
+    print(candidate_node_alignments)
     # finds seed node with lowest number of alignments
     seed_node = select_seed_nodes(candidate_node_alignments, 0)
-    start_nodes = candidate_node_alignments[seed_node]
-                      if seed_node in candidate_node_alignments else []
+    start_nodes = candidate_node_alignments[seed_node] \
+                if seed_node in candidate_node_alignments else []
+
+    print("start_nodes are: {}".format(start_nodes))
     # construct provenance graph
-    graph = construct_graph(filename)
+    graph = construct_graph(provenance_graph_filename)
 
     # do backward traversal
     # for this we construct another provenance graph
     # where the edges are in reverse
-    reverse_graph = construct_reverse_graph(filename)
+    reverse_graph = construct_reverse_graph(provenance_graph_filename)
 
     # do forward and backward traversal
     #TODO: optimization using influence score.
@@ -84,15 +88,20 @@ def find_subset_of_candidate_node_alignments(g_q_nodes_with_type,
     for nodes in start_nodes:
         visited = set()
         do_dfs(graph, nodes, visited)
+        # remove original node
+        visited.discard(nodes)
         backward_visited = set()
         do_dfs(reverse_graph, nodes, backward_visited)
-        all_nodes_visited = visited.union(backward_visited)
+        # remove original node
+        backward_visited.discard(nodes)
+        all_nodes_visited = \
+            all_nodes_visited.union(visited.union(backward_visited))
 
     # in candidate_node_alignments, only keep those nodes that are found
     # in the backward and forward traversal we did.
     for node_alignment in candidate_node_alignments:
-        candidate_node_alignments[node_alignment]
-                  = list(set(candidate_node_alignments[node_alignment]) & all_nodes_visited)
+        candidate_node_alignments[node_alignment] \
+                = list(set(candidate_node_alignments[node_alignment]) & all_nodes_visited)
 
     return candidate_node_alignments
 
@@ -111,13 +120,14 @@ def find_graph_alignment(query_graph_filename, provenance_graph_filename, thresh
     # maintain aligned nodes
     aligned_nodes = {}
     # find all nodes in query graph with type
-    query_all_nodes_with_type =
+    query_all_nodes_with_type = \
              get_all_nodes_with_type_in_graph(query_graph_filename)
 
     # find candidate node alignments from step 3
-    candidate_node_alignments =
+    candidate_node_alignments = \
              find_subset_of_candidate_node_alignments(query_all_nodes_with_type,
                                             provenance_graph_filename)
+    print("candidate_node_alignments from step 3: {}".format(candidate_node_alignments))
 
     # construct query graph
     query_graph = construct_graph(query_graph_filename)
@@ -130,10 +140,17 @@ def find_graph_alignment(query_graph_filename, provenance_graph_filename, thresh
     for candidate_node in candidate_node_alignments:
         out_visited = set()
         in_visited = set()
+
         do_dfs(query_graph, candidate_node, out_visited)
+        out_visited.discard(candidate_node)
+
         do_dfs(reverse_query_graph, candidate_node, in_visited)
+        in_visited.discard(candidate_node)
+
         candidate_node_alignment_scores = {}
         for candidate_aligned_node in candidate_node_alignments[candidate_node]:
+            out_final_influence_score = 0
+            in_final_influence_score = 0
             # for all outgoing flows in query graph
             for visited_node in out_visited:
                 # node in query graph is not aligned yet
@@ -142,14 +159,14 @@ def find_graph_alignment(query_graph_filename, provenance_graph_filename, thresh
                     # and all candidate nodes of this visited_node
                     influence_scores = []
                     for candidate_visited_node in candidate_node_alignments[visited_node]:
-                        influence_score = compute_influence_score(candidate_node,
+                        influence_score = compute_influence_score(candidate_aligned_node,
                                        candidate_visited_node, threshold,
                                        provenance_graph_filename)
                         influence_scores.append(influence_score)
                     out_final_influence_score = max(influence_scores)
                 # node in query graph is aligned
                 else:
-                    out_final_influence_score = compute_influence_score(candidate_node,
+                    out_final_influence_score = compute_influence_score(candidate_aligned_node,
                                       aligned_nodes[visited_node], threshold,
                                       provenance_graph_filename)
             # do the same for all incoming flows in query graph
@@ -160,18 +177,18 @@ def find_graph_alignment(query_graph_filename, provenance_graph_filename, thresh
                     # and all candidate nodes of this visited_node
                     influence_scores = []
                     for candidate_visited_node in candidate_node_alignments[visited_node]:
-                        influence_score = compute_influence_score(candidate_node,
+                        influence_score = compute_influence_score(candidate_aligned_node,
                                        candidate_visited_node, threshold,
                                        provenance_graph_filename)
                         influence_scores.append(influence_score)
                     in_final_influence_score = max(influence_scores)
                 # node in query graph is aligned
                 else:
-                    in_final_influence_score = compute_influence_score(candidate_node,
+                    in_final_influence_score = compute_influence_score(candidate_aligned_node,
                                      aligned_nodes[visited_node], threshold,
                                      provenance_graph_filename)
-            total_influence_score = out_final_influence_score +
-                                     in_final_influence_score
+            total_influence_score = out_final_influence_score + \
+                                    in_final_influence_score
             candidate_node_alignment_scores[candidate_aligned_node] = total_influence_score
         aligned_nodes[candidate_node] = max(candidate_node_alignment_scores,
                                             key=candidate_node_alignment_scores.get)

@@ -8,7 +8,33 @@ node_type = {'a': "process",
              'e': "n/a",
              'f': "stdin",
              'g': "stdout",
-             'h': "stderr"
+             'h': "stderr",
+             'i': "accept",
+             'j': "access",
+             'k': "bind",
+             'l': "chmod",
+             'm': "clone",
+             'n': "close",
+             'o': "connect",
+             'p': "execve",
+             'q': "fstat",
+             'r': "ftruncate",
+             's': "listen",
+             't': "mmap2",
+             'u': "open",
+             'v': "read",
+             'w': "recv",
+             'x': "recvfrom",
+             'y': "recvmsg",
+             'z': "send",
+             'A': "sendmsg",
+             'B': "sendto",
+             'C': "stat",
+             'D': "truncate",
+             'E': "unlink",
+             'F': "waitpid",
+             'G': "write",
+             'H': "writev"
              }
 
 def get_all_nodes_in_graph(filename):
@@ -179,7 +205,8 @@ def find_all_paths(graph, node_start, node_end, path=[]):
 
 def do_dfs(graph, node, visited):
     '''
-    given start node, perform forward traversal using dfs
+    given start node, perform 
+    forward and backward traversal using dfs
     params: graph: the original provenance graph
             node: start node
             visited: track nodes that have been visited
@@ -188,8 +215,7 @@ def do_dfs(graph, node, visited):
         visited.add(node)
         if node in graph:
             for neighbor in graph[node]:
-                dfs(graph, neighbor, visited)
-    visited.discard(node)
+                do_dfs(graph, neighbor, visited)
 
 def construct_graph(filename):
     '''
@@ -209,6 +235,7 @@ def construct_graph(filename):
             else:
                 graph[int(entry[0])] = set()
     graph = {key: list(value) for key, value in graph.items()}
+    return graph
 
 def construct_reverse_graph(filename):
     '''
@@ -226,5 +253,28 @@ def construct_reverse_graph(filename):
             else:
                 graph[int(entry[1])] = set()
     graph = {key: list(value) for key, value in graph.items()}
+    return graph
+
+def check_if_child_process(node_a, node_b, filename):
+    '''
+    this utility function will check if node_b is a
+    child process of node_a, filename contains the
+    original provenance graph.
+    params: node_a -> parent process node
+          : node_b -> child process node
+          : filename -> provenance graph.
+    returns: true or false
+    '''
+    graph = {}
+    with open(filename, 'r') as f:
+        for line in f:
+            entry = line.split()
+            if int(entry[0]) == node_a and \
+                int(entry[1]) == node_b:
+                # now check if it was cloned
+                if (entry[2].split(':')[2] == 'm'):
+                    return True
+    return False
+                            
 
 

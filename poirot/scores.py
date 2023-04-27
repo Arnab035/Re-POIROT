@@ -15,6 +15,12 @@ def min_number_of_compromise_points(flow, filename):
                   ending at node j
             filename: filename containing graph
     '''
+    # note, for a flow, C_min (i-->j) if i is a
+    # parent process and j is a child process,
+    # then C_min(i-->j) == 1.
+    if len(flow) == 2:
+        if check_if_child_process(flow[0], flow[1], filename):
+            return 1
     process_nodes = []
     unique_nodes = find_unique_nodes_from_flow(flow)
     for unique_node in unique_nodes:
@@ -55,6 +61,7 @@ def compute_influence_score(node_a, node_b, threshold, filename):
             gamma = max(gamma, 1/cmin)
     print("The influence score between nodes: {} and {} is {}".format(node_a, node_b,
                                    gamma))
+    return gamma
 
 def compute_alignment_score(query_graph_filename, provenance_graph_filename,
                                     aligned_nodes):
