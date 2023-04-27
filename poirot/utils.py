@@ -177,3 +177,16 @@ def find_all_paths(graph, node_start, node_end, path=[]):
                 paths.append(newpath)
     return paths
 
+def do_dfs(graph, node, visited):
+    '''
+    given start node, perform forward traversal using dfs
+    params: graph: the original provenance graph
+            node: start node
+            visited: track nodes that have been visited
+    '''
+    if node not in visited:
+        visited.add(node)
+        if node in graph:
+            for neighbor in graph[node]:
+                dfs(graph, neighbor, visited)
+
