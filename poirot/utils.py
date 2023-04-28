@@ -205,7 +205,7 @@ def find_all_paths(graph, node_start, node_end, path=[]):
 
 def do_dfs(graph, node, visited):
     '''
-    given start node, perform 
+    given start node, perform
     forward and backward traversal using dfs
     params: graph: the original provenance graph
             node: start node
@@ -233,7 +233,7 @@ def construct_graph(filename):
             if int(entry[0]) in graph:
                 graph[int(entry[0])].add(int(entry[1]))
             else:
-                graph[int(entry[0])] = set()
+                graph[int(entry[0])] = set([int(entry[1])])
     graph = {key: list(value) for key, value in graph.items()}
     return graph
 
@@ -251,7 +251,7 @@ def construct_reverse_graph(filename):
             if int(entry[1]) in graph:
                 graph[int(entry[1])].add(int(entry[0]))
             else:
-                graph[int(entry[1])] = set()
+                graph[int(entry[1])] = set([int(entry[1])])
     graph = {key: list(value) for key, value in graph.items()}
     return graph
 
@@ -275,6 +275,6 @@ def check_if_child_process(node_a, node_b, filename):
                 if (entry[2].split(':')[2] == 'm'):
                     return True
     return False
-                            
+
 
 

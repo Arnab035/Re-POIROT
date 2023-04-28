@@ -64,7 +64,7 @@ def compute_influence_score(node_a, node_b, threshold, filename):
     return gamma
 
 def compute_alignment_score(query_graph_filename, provenance_graph_filename,
-                                    aligned_nodes):
+                                    aligned_nodes, threshold):
     '''
     This computes the alignment score between two graph alignments
     S(Gq :: Gp) where Gq is query graph and Gp is alignment from
@@ -73,6 +73,7 @@ def compute_alignment_score(query_graph_filename, provenance_graph_filename,
     params: query_graph_filename
             provenance_graph_filename
             aligned_nodes obtained from step 4 of poirot
+            threshold for computation of influence score.
     returns: alignment score as outlined in equation 2.
     '''
     query_graph = construct_graph(query_graph_filename)
@@ -80,13 +81,16 @@ def compute_alignment_score(query_graph_filename, provenance_graph_filename,
     # over all nodes
     all_nodes = get_all_nodes_in_graph(query_graph_filename)
     total_influence_score = 0
+    num_flows = 0
     for node in all_nodes:
         visited = set()
         do_dfs(query_graph, node, visited)
+        visited.discard(node)
         for visited_node in visited:
             influence_score = compute_influence_score(aligned_nodes[node],
                     aligned_nodes[visited_node], threshold,
                     provenance_graph_filename)
             total_influence_score += influence_score
             num_flows += 1
-    return total_influence_score/num_flows
+    print(total_influence_score)
+    return float(total_influence_score)/float(num_flows)
