@@ -22,5 +22,9 @@ if __name__ == "__main__":
     alignment_score = compute_alignment_score(query_graph_file, provenance_graph_file,
                                         graph_alignment, threshold)
     print("Alignment score of the node alignment: {0:0.6f}".format(alignment_score))
+    if alignment_score >= 1.0/float(threshold):
+        print("Alert! Attacker may be present.")
+    else:
+        print("Safe here!")
 
 
