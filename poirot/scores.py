@@ -58,9 +58,7 @@ def compute_influence_score(node_a, node_b, threshold, filename):
     for flow in all_flows:
         cmin = min_number_of_compromise_points(flow, filename)
         if cmin != 0 and cmin <= threshold:
-            gamma = max(gamma, 1/cmin)
-    print("The influence score between nodes: {} and {} is {}".format(node_a, node_b,
-                                   gamma))
+            gamma = max(gamma, 1.0/cmin)
     return gamma
 
 def compute_alignment_score(query_graph_filename, provenance_graph_filename,
@@ -91,5 +89,7 @@ def compute_alignment_score(query_graph_filename, provenance_graph_filename,
                     aligned_nodes[visited_node], threshold,
                     provenance_graph_filename)
             total_influence_score += influence_score
-            num_flows += 1
+            # F(G) is the set of all flows s.t. i != j
+            if aligned_nodes[node] != aligned_nodes[visited_node]:
+                num_flows += 1
     return float(total_influence_score)/float(num_flows)

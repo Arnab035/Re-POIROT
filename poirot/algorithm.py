@@ -52,12 +52,15 @@ def select_seed_nodes(candidate_alignments, index):
 
 #step 3
 def find_subset_of_candidate_node_alignments(g_q_nodes_with_type,
-        provenance_graph_filename):
+        provenance_graph_filename, index):
     '''
     params: g_q_nodes_with_type -> list of (node_id, node_type)
                            from the query graph.
             provenance_graph_filename -> filename containing
                             provenance graph
+            index -> the index of the seed node (we choose the
+                    seed node with the least number of alignments,
+                    at the start and then keep moving)
     result: {node_id : [subset_node_alignments]} where node_id is the
             node from query graph.
             subset_node_alignments is the list of node alignments
@@ -67,7 +70,7 @@ def find_subset_of_candidate_node_alignments(g_q_nodes_with_type,
     candidate_node_alignments = find_candidate_node_alignments(g_q_nodes_with_type,
             provenance_graph_filename)
     # finds seed node with lowest number of alignments
-    seed_node = select_seed_nodes(candidate_node_alignments, 0)
+    seed_node = select_seed_nodes(candidate_node_alignments, index)
     start_nodes = candidate_node_alignments[seed_node] \
                 if seed_node in candidate_node_alignments else []
 
@@ -104,11 +107,15 @@ def find_subset_of_candidate_node_alignments(g_q_nodes_with_type,
 
 
 # do step 4
-def find_graph_alignment(query_graph_filename, provenance_graph_filename, threshold):
+def find_graph_alignment(query_graph_filename, provenance_graph_filename, threshold, \
+                            index):
     '''
     params: query_graph_filename-> a filename representing the query graph
             provenance_graph_filename -> a filename representing the provenance graph
             threshold -> the threshold used for computing influence score
+            index -> the index of the seed node (we choose the seed node with the
+                    least number of alignments, so index starts with 0 and keeps
+                    increasing)
     returns: a dict {g_q : g_p} where the keys "g_q" represent the nodes of the
              query graph and values "g_p" are a subset of candidate node alignments
              found in step 2 (usually, the best node alignment),
@@ -123,7 +130,7 @@ def find_graph_alignment(query_graph_filename, provenance_graph_filename, thresh
     # find candidate node alignments from step 3
     candidate_node_alignments = \
              find_subset_of_candidate_node_alignments(query_all_nodes_with_type,
-                                            provenance_graph_filename)
+                                            provenance_graph_filename, index)
     # construct query graph
     query_graph = construct_graph(query_graph_filename)
 
