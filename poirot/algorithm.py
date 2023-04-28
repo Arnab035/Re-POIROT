@@ -48,7 +48,6 @@ def select_seed_nodes(candidate_alignments, index):
     '''
     sorted_node_alignments = sorted(candidate_alignments,
             key=lambda k: len(candidate_alignments[k]))
-    print("sorted node alignments are : {}".format(sorted_node_alignments))
     return sorted_node_alignments[index]
 
 #step 3
@@ -67,13 +66,11 @@ def find_subset_of_candidate_node_alignments(g_q_nodes_with_type,
     '''
     candidate_node_alignments = find_candidate_node_alignments(g_q_nodes_with_type,
             provenance_graph_filename)
-    print(candidate_node_alignments)
     # finds seed node with lowest number of alignments
     seed_node = select_seed_nodes(candidate_node_alignments, 0)
     start_nodes = candidate_node_alignments[seed_node] \
                 if seed_node in candidate_node_alignments else []
 
-    print("start_nodes are: {}".format(start_nodes))
     # construct provenance graph
     graph = construct_graph(provenance_graph_filename)
 
@@ -127,8 +124,6 @@ def find_graph_alignment(query_graph_filename, provenance_graph_filename, thresh
     candidate_node_alignments = \
              find_subset_of_candidate_node_alignments(query_all_nodes_with_type,
                                             provenance_graph_filename)
-    print("candidate_node_alignments from step 3: {}".format(candidate_node_alignments))
-
     # construct query graph
     query_graph = construct_graph(query_graph_filename)
 

@@ -92,5 +92,4 @@ def compute_alignment_score(query_graph_filename, provenance_graph_filename,
                     provenance_graph_filename)
             total_influence_score += influence_score
             num_flows += 1
-    print(total_influence_score)
     return float(total_influence_score)/float(num_flows)

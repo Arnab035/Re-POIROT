@@ -251,7 +251,7 @@ def construct_reverse_graph(filename):
             if int(entry[1]) in graph:
                 graph[int(entry[1])].add(int(entry[0]))
             else:
-                graph[int(entry[1])] = set([int(entry[1])])
+                graph[int(entry[1])] = set([int(entry[0])])
     graph = {key: list(value) for key, value in graph.items()}
     return graph
 
