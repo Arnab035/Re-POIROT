@@ -89,11 +89,13 @@ def find_subset_of_candidate_node_alignments(g_q_nodes_with_type,
         visited = set()
         do_dfs(graph, nodes, visited)
         # remove original node
-        visited.discard(nodes)
+        if len(visited) <= 1:
+            visited.discard(nodes)
         backward_visited = set()
         do_dfs(reverse_graph, nodes, backward_visited)
         # remove original node
-        backward_visited.discard(nodes)
+        if len(backward_visited) <= 1:
+            backward_visited.discard(nodes)
         all_nodes_visited = \
             all_nodes_visited.union(visited.union(backward_visited))
 
@@ -102,7 +104,6 @@ def find_subset_of_candidate_node_alignments(g_q_nodes_with_type,
     for node_alignment in candidate_node_alignments:
         candidate_node_alignments[node_alignment] \
                 = list(set(candidate_node_alignments[node_alignment]) & all_nodes_visited)
-
     return candidate_node_alignments
 
 
@@ -165,7 +166,8 @@ def find_graph_alignment(query_graph_filename, provenance_graph_filename, thresh
                                        candidate_visited_node, threshold,
                                        provenance_graph_filename)
                         influence_scores.append(influence_score)
-                    out_final_influence_score = max(influence_scores)
+                    out_final_influence_score = max(influence_scores) if len(influence_scores) > 0 \
+                                                            else 0
                 # node in query graph is aligned
                 else:
                     out_final_influence_score = compute_influence_score(candidate_aligned_node,
@@ -183,7 +185,8 @@ def find_graph_alignment(query_graph_filename, provenance_graph_filename, thresh
                                        candidate_visited_node, threshold,
                                        provenance_graph_filename)
                         influence_scores.append(influence_score)
-                    in_final_influence_score = max(influence_scores)
+                    in_final_influence_score = max(influence_scores) if len(influence_scores) > 0 \
+                                                            else 0
                 # node in query graph is aligned
                 else:
                     in_final_influence_score = compute_influence_score(candidate_aligned_node,
@@ -194,4 +197,5 @@ def find_graph_alignment(query_graph_filename, provenance_graph_filename, thresh
             candidate_node_alignment_scores[candidate_aligned_node] = total_influence_score
         aligned_nodes[candidate_node] = max(candidate_node_alignment_scores,
                                             key=candidate_node_alignment_scores.get)
+        print("Aligned node for candidate node {} is {}".format(candidate_node, aligned_nodes[candidate_node]))
     return aligned_nodes
