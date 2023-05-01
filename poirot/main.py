@@ -32,7 +32,7 @@ if __name__ == "__main__":
         print("Time taken to run: {}".format(end - start))
         if alignment_score >= 1.0/float(threshold):
             print("Alert! Attacker may be present.")
-            return
+            sys.exit()
         else:
             print("Could not find attacker, trying again with another seed node...")
     print("Attacker may not be present in the system.")
