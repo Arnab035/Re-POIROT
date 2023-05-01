@@ -1,7 +1,9 @@
 import sys
+import time
 from scores import *
 from algorithm import *
 from utils import *
+
 
 if __name__ == "__main__":
     print("Starting Poirot...")
@@ -19,15 +21,18 @@ if __name__ == "__main__":
     print("Using query graph file: {}".format(query_graph_file))
     num_nodes = len(get_all_nodes_in_graph(query_graph_file))
     for i in range(0, num_nodes):
+        start = time.time()
         graph_alignment = find_graph_alignment(query_graph_file, provenance_graph_file,
                                       threshold, i)
         print("Final node alignment: {}".format(graph_alignment))
         alignment_score = compute_alignment_score(query_graph_file, provenance_graph_file,
                                         graph_alignment, threshold)
         print("Alignment score of the node alignment: {0:0.6f}".format(alignment_score))
+        end = time.time()
+        print("Time taken to run: {}".format(end - start))
         if alignment_score >= 1.0/float(threshold):
             print("Alert! Attacker may be present.")
-            break
+            return
         else:
             print("Could not find attacker, trying again with another seed node...")
     print("Attacker may not be present in the system.")

@@ -161,12 +161,13 @@ def find_graph_alignment(query_graph_filename, provenance_graph_filename, thresh
                     # find maximum influence score of candidate_node
                     # and all candidate nodes of this visited_node
                     influence_scores = []
-                    for candidate_visited_node in candidate_node_alignments[visited_node]:
-                        influence_score = compute_influence_score(candidate_aligned_node,
+                    if visited_node in candidate_node_alignments:
+                        for candidate_visited_node in candidate_node_alignments[visited_node]:
+                            influence_score = compute_influence_score(candidate_aligned_node,
                                        candidate_visited_node, threshold,
                                        provenance_graph_filename)
-                        influence_scores.append(influence_score)
-                    out_final_influence_score = max(influence_scores) if len(influence_scores) > 0 \
+                            influence_scores.append(influence_score)
+                        out_final_influence_score = max(influence_scores) if len(influence_scores) > 0 \
                                                             else 0
                 # node in query graph is aligned
                 else:
@@ -180,12 +181,13 @@ def find_graph_alignment(query_graph_filename, provenance_graph_filename, thresh
                     # find max. influence score of candidate_node
                     # and all candidate nodes of this visited_node
                     influence_scores = []
-                    for candidate_visited_node in candidate_node_alignments[visited_node]:
-                        influence_score = compute_influence_score(candidate_aligned_node,
+                    if visited_node in candidate_node_alignments:
+                        for candidate_visited_node in candidate_node_alignments[visited_node]:
+                            influence_score = compute_influence_score(candidate_aligned_node,
                                        candidate_visited_node, threshold,
                                        provenance_graph_filename)
-                        influence_scores.append(influence_score)
-                    in_final_influence_score = max(influence_scores) if len(influence_scores) > 0 \
+                            influence_scores.append(influence_score)
+                        in_final_influence_score = max(influence_scores) if len(influence_scores) > 0 \
                                                             else 0
                 # node in query graph is aligned
                 else:
