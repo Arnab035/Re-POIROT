@@ -104,6 +104,9 @@ def find_subset_of_candidate_node_alignments(g_q_nodes_with_type,
     for node_alignment in candidate_node_alignments:
         candidate_node_alignments[node_alignment] \
                 = list(set(candidate_node_alignments[node_alignment]) & all_nodes_visited)
+    print("Printing candidate node alignment lengths: ")
+    for node_alignment in candidate_node_alignments:
+        print("{}: {}".format(node_alignment, len(candidate_node_alignments[node_alignment])))
     return candidate_node_alignments
 
 
