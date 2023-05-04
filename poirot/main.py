@@ -57,3 +57,13 @@ if __name__ == "__main__":
             else:
                 print("Could not find attacker, trying again with another seed node...")
     print("Attacker may not be present in the system.")
+
+    # uncomment the below code to perform memory analysis of POIROT
+    '''
+    print("Now doing memory analysis...for the first round of POIROT")
+    import algorithm as data
+    from memory_profiler import memory_usage
+    mem_usage = memory_usage((data.find_graph_alignment, (query_graph_file, provenance_graph_file, threshold, 0)), \
+                            interval = 1)
+    print("Average memory consumed: {} MB".format(sum(mem_usage)/float(len(mem_usage))))
+    '''
